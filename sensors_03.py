@@ -6,6 +6,8 @@ import json
 import os
 import time
 
+from multipledispatch import dispatch
+
 SLEEP_TIME = 200  # in ms
 T_SAMPLES = 10
 
@@ -58,8 +60,21 @@ def estimate_temp():
     return t_est
 
 
+@dispatch()
 def get_sensors_data():
     sensors_data["temperature"] = estimate_temp()
     sensors_data["humidity"] = read_sense_humidity()
     sensors_data["pressure"] = read_sense_pressure()
     return json.dumps(sensors_data, indent=2)
+
+
+@dispatch(str)
+def get_sensors_data(sense):  # noqa: F811
+    if sense == "temperature":
+        return json.dumps({"temperature": estimate_temp()}, indent=2)
+    elif sense == "humidity":
+        return json.dumps({"humidity": read_sense_humidity()}, indent=2)
+    elif sense == "pressure":
+        return json.dumps({"pressure": read_sense_pressure()}, indent=2)
+    else:
+        return json.dumps(sensors_data, indent=2)
