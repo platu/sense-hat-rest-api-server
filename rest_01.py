@@ -13,10 +13,10 @@ def index():
     return redirect("/api/v1", code=302)
 
 
-@app.route("/api/v1", methods=["GET"])
+@app.route("/api/v1", methods=["GET"], strict_slashes=False)
 def main():
-    main_data = ["sensors", "leds", "messages"]
-    return json.dumps(main_data, indent=2)
+    main_routes = ["sensors", "leds", "messages"]
+    return json.dumps(main_routes, indent=2)
 
 
 if __name__ == "__main__":
