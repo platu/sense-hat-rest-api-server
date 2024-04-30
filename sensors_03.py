@@ -1,27 +1,23 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from sense_hat import SenseHat
 import json
 import os
 import time
 
 from multipledispatch import dispatch
+from sense_hat import SenseHat
 
 SLEEP_TIME = 200  # in ms
 T_SAMPLES = 10
 
-sensors_data = {
-    "temperature": [],
-    "humidity": [],
-    "pressure": []
-}
+sensors_data = {"temperature": [], "humidity": [], "pressure": []}
 
 sense = SenseHat()
 
 
 def read_cpu_temp():
-    res = os.popen("vcgencmd measure_temp").readline()
+    res = os.popen("vcgencmd measure_temp").readline()  # nosec
     t = float(res.replace("temp=", "").replace("'C\n", ""))
     return t
 
