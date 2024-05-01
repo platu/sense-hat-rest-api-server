@@ -10,7 +10,6 @@ from sense_hat import SenseHat
 SLEEP_TIME = 200  # in ms
 T_SAMPLES = 10
 
-sensors_data = {"temperature": "", "humidity": "", "pressure": ""}
 
 sense = SenseHat()
 
@@ -56,7 +55,15 @@ def estimate_temp():
 
 
 def get_sensors_data():
+    """Collects temperature, humidity and pressure measures from the Sense HAT.
+
+    Returns:
+        JSON dictionary: temperature, humidity and pressure measures
+    """
+    sensors_data = {"temperature": "", "humidity": "", "pressure": ""}
+
     sensors_data["temperature"] = estimate_temp()
     sensors_data["humidity"] = read_sense_humidity()
     sensors_data["pressure"] = read_sense_pressure()
+
     return json.dumps(sensors_data, indent=2)
