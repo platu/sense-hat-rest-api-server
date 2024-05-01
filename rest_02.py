@@ -15,16 +15,16 @@ def index():
     return redirect("/api/v1", code=302)
 
 
-@app.route("/api/v1", methods=["get"])
+@app.route("/api/v1", methods=["get"], strict_slashes=False)
 def main():
     main_data = ["sensors", "leds", "messages"]
     return json.dumps(main_data, indent=2)
 
 
-@app.route("/api/v1/sensors", methods=["get"])
+@app.route("/api/v1/sensors", methods=["get"], strict_slashes=False)
 def sensors_route():
     return sensors.get_sensors_data()
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=8080)  # nosec
+    app.run(debug=True, host="::", port=8080)  # nosec

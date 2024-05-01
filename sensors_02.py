@@ -10,7 +10,7 @@ from sense_hat import SenseHat
 SLEEP_TIME = 200  # in ms
 T_SAMPLES = 10
 
-sensors_data = {"temperature": [], "humidity": [], "pressure": []}
+sensors_data = {"temperature": "", "humidity": "", "pressure": ""}
 
 sense = SenseHat()
 
