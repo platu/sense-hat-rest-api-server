@@ -36,5 +36,5 @@ sense.set_pixels(rgb_matrix)
 # print(rgb_matrix)
 
 # Compose JSON data
-json_data = json.dumps({"leds": json.dumps(rgb_matrix)})
+json_data = json.dumps({"leds": "" + str(rgb_matrix) + ""})
 print(json_data)
