@@ -60,7 +60,30 @@ def route_read_leds():
     return leds.read_leds()
 
 
-@app.route("api/v1/leds", methods=["post"], strict_slashes=False)
+@app.route("/api/v1/leds", methods=["delete"], strict_slashes=False)
+def route_clear_leds():
+    if request.data:
+        try:
+            data = request.get_json()
+        except json.JSONDecodeError:
+            return json.dumps({"error": "Invalid JSON"}, indent=2), 400
+        if "color" in data:
+            rgb = json.loads(data["color"])
+            try:
+                for c in rgb:
+                    if (c >= 0) and (c <= 255):
+                        pass
+            except ValueError:
+                return json.dumps({"error": "Invalid color value"}, indent=2), 400
+            except TypeError:
+                return json.dumps({"error": "Invalid color type"}, indent=2), 400
+            leds.clear_leds(rgb)
+    else:
+        leds.clear_leds()
+    return json.dumps({"message": "LEDs cleared"}, indent=2)
+
+
+@app.route("/api/v1/leds", methods=["post"], strict_slashes=False)
 def route_set_leds():
     try:
         data = request.get_json()
@@ -69,7 +92,12 @@ def route_set_leds():
     if "leds" not in data:
         return json.dumps({"error": "Missing 'leds' key"}, indent=2), 400
     else:
-        leds.set_leds(data["leds"])
+        matrix = json.loads(data["leds"])
+        print(matrix)
+        if len(matrix) != 64:
+            return json.dumps({"error": "Invalid matrix size"}, indent=2), 400
+        else:
+            leds.set_leds(matrix)
     return json.dumps({"message": "LEDs processed"}, indent=2)
 
 

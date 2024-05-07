@@ -1,29 +1,40 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import json
+
 from PIL import Image
 from sense_hat import SenseHat
+from functools import reduce
+from operator import add
 
 sense = SenseHat()
 
-# Charger l'image
+# Load image
 image = Image.open("pixelart.png")
 
-# Redimensionner à 8x8 pixels
+# Resize to 8x8 pixels
 image = image.resize((8, 8))
 
-# Créer une matrice 8x8 vide
+# Create an empty 8x8 matrix
 color = [0, 0, 0]
-matrice_rgb = [[color for _ in range(8)] for _ in range(8)]
+rgb_matrix = [[color for _ in range(8)] for _ in range(8)]
 
-# Parcourir les pixels et remplir la matrice
+# Parse image and fill matrix
 for y in range(8):
     for x in range(8):
         r, g, b, u = image.getpixel((x, y))
-        matrice_rgb[y][x] = [r, g, b]
+        rgb_matrix[y][x] = [r, g, b]
 
-# Afficher la matrice
-for ligne in matrice_rgb:
-    print(ligne)
+# Flatten matrix to a single list of colors
+rgb_matrix = reduce(add, rgb_matrix)
 
-sense.set_pixels(sum(matrice_rgb, []))
+# Send matrix to Sense HAT
+sense.set_pixels(rgb_matrix)
+
+# Print matrix
+# print(rgb_matrix)
+
+# Compose JSON data
+json_data = json.dumps({"leds": json.dumps(rgb_matrix)})
+print(json_data)

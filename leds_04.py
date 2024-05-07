@@ -32,10 +32,19 @@ def post_message(msg, speed, fg, bg):  # noqa F811
     sense.show_message(msg, speed, fg_color, bg_color)
 
 
+@dispatch()
+def clear_leds():
+    sense.clear()
+
+
+@dispatch(list)
+def clear_leds(color):  # noqa F811
+    sense.clear(color)
+
+
 def read_leds():
     return json.dumps(sense.get_pixels(), indent=2)
 
 
 def set_leds(leds):
-    display = json.loads(leds)
-    sense.set_pixels(display)
+    sense.set_pixels(leds)
