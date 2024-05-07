@@ -92,3 +92,51 @@ def route_messages():
             # Scroll message with or without speed
             leds.post_message(msg, speed)
     return json.dumps({"message": "Message processed"}, indent=2)
+
+
+@app.route("/api/v1/leds", methods=["get"], strict_slashes=False)
+def route_read_leds():
+    return leds.read_leds()
+
+
+@app.route("/api/v1/leds", methods=["delete"], strict_slashes=False)
+def route_clear_leds():
+    if request.data:
+        try:
+            data = request.get_json()
+        except json.JSONDecodeError:
+            return json.dumps({"error": "Invalid JSON"},
+                              indent=2), 400
+        if "color" in data:
+            rgb = json.loads(data["color"])
+            rgb_valid, rgb_error = _isColorValid(rgb)
+            if not rgb_valid:
+                return json.dumps({"error": rgb_error},
+                                  indent=2), 400
+            else:
+                leds.clear_leds(rgb)
+    else:
+        leds.clear_leds()
+    return json.dumps({"message": "LEDs cleared"}, indent=2)
+
+
+@app.route("/api/v1/leds", methods=["post"], strict_slashes=False)
+def route_set_leds():
+    try:
+        data = request.get_json()
+    except json.JSONDecodeError:
+        return json.dumps({"error": "Invalid JSON"}, indent=2), 400
+    if "leds" not in data:
+        return json.dumps({"error": "Missing 'leds' key"}, indent=2), 400
+    else:
+        matrix = json.loads(data["leds"])
+        print(matrix)
+        if len(matrix) != 64:
+            return json.dumps({"error": "Invalid matrix size"}, indent=2), 400
+        else:
+            leds.set_leds(matrix)
+    return json.dumps({"message": "LEDs processed"}, indent=2)
+
+
+if __name__ == "__main__":
+    app.run(debug=True, host="::", port=8080)  # nosec

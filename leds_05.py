@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import json
+
 
 from multipledispatch import dispatch
 from sense_hat import SenseHat
@@ -30,3 +32,28 @@ def post_message(msg, speed):  # noqa F811
 @dispatch(str, float, list, list)
 def post_message(msg, speed, fg_color, bg_color):  # noqa F811
     sense.show_message(msg, speed, fg_color, bg_color)
+
+
+# ----------------------------------------------------------------------------
+# Manage the led matrix display as a whole
+# Clear the led matrix display with 2 different cases:
+# 1. No arguments
+# 2. A color to fill the led matrix display
+@dispatch()
+def clear_leds():
+    sense.clear()
+
+
+@dispatch(list)
+def clear_leds(color):  # noqa F811
+    sense.clear(color)
+
+
+# Read all leds at once
+def read_leds():
+    return json.dumps(sense.get_pixels(), indent=2)
+
+
+# Set all leds at once
+def set_leds(leds):
+    sense.set_pixels(leds)

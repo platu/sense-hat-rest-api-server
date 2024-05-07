@@ -11,6 +11,7 @@ from operator import add
 sense = SenseHat()
 
 # Load image
+# pixelart.png is a symlink to the actual image
 image = Image.open("pixelart.png")
 
 # Resize to 8x8 pixels
@@ -29,12 +30,14 @@ for y in range(8):
 # Flatten matrix to a single list of colors
 rgb_matrix = reduce(add, rgb_matrix)
 
-# Send matrix to Sense HAT
+# Send matrix to Sense HAT to validate the image
 sense.set_pixels(rgb_matrix)
 
 # Print matrix
 # print(rgb_matrix)
 
 # Compose JSON data
+# Run the script and redirect the output to a file
+# python3 pixelart.py > yoda.json
 json_data = json.dumps({"leds": "" + str(rgb_matrix) + ""})
 print(json_data)
