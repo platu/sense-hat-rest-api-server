@@ -67,56 +67,63 @@ def create_app():
                 ), 400
         else:
             data = request.get_json()
-        if "msg" not in data:
-            return json.dumps(
-                {"error": "Missing 'msg' key"}
-                ), 400
-        else:
-            msg = data["msg"]
-            if "speed" in data:
-                try:
-                    speed = float(data["speed"])
-                except ValueError:
-                    return json.dumps(
-                        {"error": "Invalid speed value"}
-                        ), 400
+            if "msg" not in data:
+                return json.dumps(
+                    {"error": "Missing 'msg' key"}
+                    ), 400
             else:
-                # Back to default speed
-                speed = 0.1
-            if "fg" in data and "bg" in data:
-                if (not _isValidJSON(data["fg"])) or \
-                   (not _isValidJSON(data["bg"])):
-                    return json.dumps(
-                        {"error": "Invalid JSON for fg or bg"}
-                        ), 400
-                fg = json.loads(data["fg"])
-                bg = json.loads(data["bg"])
-                # Test color validity
-                # Check if fg and bg are lists with 3 elements
-                if isinstance(fg, list) and len(fg) == 3:
-                    # Check if each element is between 0 and 255
-                    fg_valid = _isValidColor(fg)
+                msg = data["msg"]
+                if "speed" in data:
+                    try:
+                        speed = float(data["speed"])
+                    except ValueError:
+                        return json.dumps(
+                            {"error": "Invalid speed value"}
+                            ), 400
+                    if "fg" in data and "bg" in data:
+                        if (not _isValidJSON(data["fg"])) or (
+                            not _isValidJSON(data["bg"])
+                        ):
+                            return (
+                                json.dumps(
+                                    {"error": "Invalid JSON for fg or bg"}),
+                                400,
+                            )
+                        fg = json.loads(data["fg"])
+                        bg = json.loads(data["bg"])
+                        # Test color validity
+                        # Check if fg and bg are lists with 3 elements
+                        if isinstance(fg, list) and len(fg) == 3:
+                            # Check if each element is between 0 and 255
+                            fg_valid = _isValidColor(fg)
+                        else:
+                            fg_valid = "Invalid color type"
+                        if isinstance(bg, list) and len(bg) == 3:
+                            # Check if each element is between 0 and 255
+                            bg_valid = _isValidColor(bg)
+                        else:
+                            bg_valid = "Invalid color type"
+                        if not fg_valid == "Valid Color":
+                            return json.dumps({"error": fg_valid}), 400
+                        if not bg_valid == "Valid Color":
+                            return json.dumps({"error": bg_valid}), 400
+                        # Scroll message with speed and
+                        # foreground + background colors
+                        leds.post_message(msg, speed, fg, bg)
+                    else:
+                        # Scroll message with speed
+                        leds.post_message(msg, speed)
                 else:
-                    fg_valid = "Invalid color type"
-                if isinstance(bg, list) and len(bg) == 3:
-                    # Check if each element is between 0 and 255
-                    bg_valid = _isValidColor(bg)
-                else:
-                    bg_valid = "Invalid color type"
-                if not fg_valid == "Valid Color":
-                    return json.dumps(
-                        {"error": fg_valid}
-                        ), 400
-                if not bg_valid == "Valid Color":
-                    return json.dumps(
-                        {"error": bg_valid}
-                        ), 400
-                # Scroll message with speed, foreground and background colors
-                leds.post_message(msg, speed, fg, bg)
-            else:
-                # Scroll message with or without speed
-                leds.post_message(msg, speed)
+                    if len(data) == 1:
+                        # Scroll message with default speed
+                        # if 'msg' is the only key
+                        leds.post_message(msg)
+                    else:
+                        return json.dumps(
+                            {"error": "Invalid JSON"}
+                            ), 400
         return json.dumps({"message": "Message processed"})
+
     return app
 
 

@@ -74,7 +74,8 @@ def test_missing_msg_key(client):
 
 def test_invalid_speed_value(client):
     response = client.post('/api/v1/messages/',
-                           json={"msg": "Hello", "speed": "invalid"})
+                           json={"msg": "Hello",
+                                 "speed": "invalid"})
     assert response.status_code == 400  # nosec B101
     assert "{\"error\": \"Invalid speed value\"}" in (
         response.data.decode()
@@ -84,6 +85,7 @@ def test_invalid_speed_value(client):
 def test_invalid_json_for_fg_and_bg(client):
     response = client.post('/api/v1/messages/',
                            json={"msg": "Hello",
+                                 "speed": "0.05",
                                  "fg": "invalid", "bg": "invalid"})
     assert response.status_code == 400  # nosec B101
     assert "{\"error\": \"Invalid JSON for fg or bg\"}" in (
@@ -94,6 +96,7 @@ def test_invalid_json_for_fg_and_bg(client):
 def test_invalid_color_list_for_fg_and_bg(client):
     response = client.post('/api/v1/messages/',
                            json={"msg": "Hello",
+                                 "speed": "0.05",
                                  "fg": "[0, 128]", "bg": "[0, 0, 0]"})
     assert response.status_code == 400  # nosec B101
     assert "{\"error\": \"Invalid color type\"}" in (
@@ -104,8 +107,19 @@ def test_invalid_color_list_for_fg_and_bg(client):
 def test_invalid_color_value_for_fg_and_bg(client):
     response = client.post('/api/v1/messages/',
                            json={"msg": "Hello",
+                                 "speed": "0.05",
                                  "fg": "[256, 0, 0]", "bg": "[0, 256, 0]"})
     assert response.status_code == 400  # nosec B101
     assert "{\"error\": \"Invalid color value\"}" in (
+        response.data.decode()
+    )  # nosec B101
+
+
+def test_invalid_JSON_keys(client):
+    response = client.post('/api/v1/messages/',
+                           json={"msg": "Hello",
+                                 "fg": "[255, 0, 0]", "bg": "[0, 255, 0]"})
+    assert response.status_code == 400  # nosec B101
+    assert "{\"error\": \"Invalid JSON\"}" in (
         response.data.decode()
     )  # nosec B101
