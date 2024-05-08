@@ -16,10 +16,42 @@ def client(app):
     return app.test_client()
 
 
-def test_successful_post(client):
+# Successful POST request only with the "msg" key
+def test_successful_msg_post(client):
     response = client.post('/api/v1/messages/',
                            json={"msg": "Hello!"})
     assert response.status_code == 200  # nosec B101
+    assert "{\"message\": \"Message processed\"}" in (
+        response.data.decode()
+    )  # nosec B101
+
+
+# Successful POST request with "msg" and "speed" keys
+def test_successful_msg_speed_post(client):
+    response = client.post('/api/v1/messages/',
+                           json={
+                               "msg": "Hello!",
+                               "speed": 0.01
+                               })
+    assert response.status_code == 200  # nosec B101
+    assert "{\"message\": \"Message processed\"}" in (
+        response.data.decode()
+    )  # nosec B101
+
+
+# Successful POST request with "msg", "speed", and color keys
+def test_successful_msg_speed_colors_post(client):
+    response = client.post('/api/v1/messages/',
+                           json={
+                               "msg": "Hello!",
+                               "speed": 0.05,
+                               "fg": "[0, 0, 255]",
+                               "bg": "[255, 255, 255]"
+                               })
+    assert response.status_code == 200  # nosec B101
+    assert "{\"message\": \"Message processed\"}" in (
+        response.data.decode()
+    )  # nosec B101
 
 
 def test_invalid_json(client):

@@ -62,25 +62,33 @@ def create_app():
     @app.route("/api/v1/messages/", methods=["post"], strict_slashes=False)
     def route_messages():
         if _isValidJSON(request.data) is False:
-            return json.dumps({"error": "Invalid JSON"}), 400
+            return json.dumps(
+                {"error": "Invalid JSON"}
+                ), 400
         else:
             data = request.get_json()
         if "msg" not in data:
-            return json.dumps({"error": "Missing 'msg' key"}), 400
+            return json.dumps(
+                {"error": "Missing 'msg' key"}
+                ), 400
         else:
             msg = data["msg"]
             if "speed" in data:
                 try:
                     speed = float(data["speed"])
                 except ValueError:
-                    return json.dumps({"error": "Invalid speed value"}), 400
+                    return json.dumps(
+                        {"error": "Invalid speed value"}
+                        ), 400
             else:
                 # Back to default speed
                 speed = 0.1
             if "fg" in data and "bg" in data:
                 if (not _isValidJSON(data["fg"])) or \
                    (not _isValidJSON(data["bg"])):
-                    return json.dumps({"error": "Invalid JSON for fg or bg"}), 400
+                    return json.dumps(
+                        {"error": "Invalid JSON for fg or bg"}
+                        ), 400
                 fg = json.loads(data["fg"])
                 bg = json.loads(data["bg"])
                 # Test color validity
@@ -96,9 +104,13 @@ def create_app():
                 else:
                     bg_valid = "Invalid color type"
                 if not fg_valid == "Valid Color":
-                    return json.dumps({"error": fg_valid}), 400
+                    return json.dumps(
+                        {"error": fg_valid}
+                        ), 400
                 if not bg_valid == "Valid Color":
-                    return json.dumps({"error": bg_valid}), 400
+                    return json.dumps(
+                        {"error": bg_valid}
+                        ), 400
                 # Scroll message with speed, foreground and background colors
                 leds.post_message(msg, speed, fg, bg)
             else:
