@@ -64,13 +64,13 @@ def create_app():
         if _isValidJSON(request.data) is False:
             return json.dumps(
                 {"error": "Invalid JSON"}
-                ), 400
+            ), 400
         else:
             data = request.get_json()
             if "msg" not in data:
                 return json.dumps(
                     {"error": "Missing 'msg' key"}
-                    ), 400
+                ), 400
             else:
                 msg = data["msg"]
                 if "speed" in data:
@@ -79,7 +79,7 @@ def create_app():
                     except ValueError:
                         return json.dumps(
                             {"error": "Invalid speed value"}
-                            ), 400
+                        ), 400
                     if "fg" in data and "bg" in data:
                         if (not _isValidJSON(data["fg"])) or (
                             not _isValidJSON(data["bg"])
@@ -121,7 +121,7 @@ def create_app():
                     else:
                         return json.dumps(
                             {"error": "Invalid JSON"}
-                            ), 400
+                        ), 400
         return json.dumps({"message": "Message processed"})
 
     return app
