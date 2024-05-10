@@ -131,21 +131,21 @@ def create_app():
     @app.route("/api/v1/leds", methods=["delete"], strict_slashes=False)
     def route_clear_leds():
         if request.data:
-            try:
-                data = request.get_json()
-            except json.JSONDecodeError:
+            if _isValidJSON(request.data) is False:
                 return json.dumps(
-                    {"error": "Invalid JSON"},
+                    {"error": "Invalid JSON"}
                     ), 400
-            if "color" in data:
-                rgb = json.loads(data["color"])
-                rgb_valid = _isValidColor(rgb)
-                if not rgb_valid == "Valid Color":
-                    return json.dumps(
-                        {"error": rgb_valid}
-                        ), 400
-                else:
-                    leds.clear_leds(rgb)
+            else:
+                data = request.get_json()
+                if "color" in data:
+                    rgb = json.loads(data["color"])
+                    rgb_valid = _isValidColor(rgb)
+                    if not rgb_valid == "Valid Color":
+                        return json.dumps(
+                            {"error": rgb_valid}
+                            ), 400
+                    else:
+                        leds.clear_leds(rgb)
         else:
             leds.clear_leds()
         return json.dumps({"message": "LEDs cleared"})
