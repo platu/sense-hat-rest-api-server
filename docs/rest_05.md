@@ -1,16 +1,19 @@
+<!-- markdownlint-disable MD024 MD026 -->
+
 # REST_05 server API Documentation
 
 ## Clear LEDs
 
 ### URL: `/api/v1/leds`
 
-#### Method: `POST`
+#### Method: `DELETE`
 
 #### Data Params:
 
 Optional:
 
 - `color` : A JSON string representing an RGB color. Each color value should be between 0 and 255.
+- Content example: `{"color": [0, 128, 0]}`
 
 #### Success Response:
 
@@ -33,6 +36,7 @@ Optional:
 Required:
 
 - `leds` : A JSON string representing a matrix of LEDs.
+- Content example: [yoda.json](../yoda.json)
 
 #### Success Response:
 
