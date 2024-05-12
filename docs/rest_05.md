@@ -12,7 +12,7 @@
 
 Optional:
 
-- `color` : A JSON string representing an RGB color. Each color value should be between 0 and 255.
+- `color`: A JSON string representing an RGB color. Each color value should be between 0 and 255.
 - Content example: `{"color": [0, 128, 0]}`
 
 #### Success Response:
@@ -24,6 +24,21 @@ Optional:
 
 - Code: 400
 - Content: `{"error": "Invalid JSON"}` OR `{"error": "Invalid color value"}` OR `{"error": "Invalid color type"}`
+
+#### API call examples:
+
+```bash
+curl -X DELETE -H "Content-Type: application/json" \
+"http://localhost:8080/api/v1/leds"
+{"message": "LEDs cleared"}%
+```
+
+```bash
+curl -X DELETE -H "Content-Type: application/json" \
+"http://localhost:8080/api/v1/leds" \
+-d '{"color": "[0, 0, 64]"}'
+{"message": "LEDs cleared"}%
+```
 
 ## Set LEDs
 
@@ -47,3 +62,14 @@ Required:
 
 - Code: 400
 - Content: `{"error": "Invalid JSON"}` OR `{"error": "Missing 'leds' key"}` OR `{"error": "Invalid matrix size"}`
+
+#### API call example:
+
+In the following example, the file `yoda.json` preexists in the current directory. Its content is filled by the `pixelart.py` script which is provided in the `pixelart` folder.
+
+```bash
+curl -X POST -H "Content-Type: application/json" \
+"http://localhost:8080/api/v1/leds" \
+-d @yoda.json
+{"message": "LEDs processed"}%
+```
