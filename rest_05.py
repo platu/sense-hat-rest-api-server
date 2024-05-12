@@ -21,7 +21,7 @@ def create_app():
     @app.route("/api/v1", methods=["get"], strict_slashes=False)
     def main():
         main_data = ["sensors", "leds", "messages"]
-        return json.dumps(main_data)
+        return json.dumps(main_data, indent=2)
 
     # ----------------------------------------------------------------------------
     # Routes for the sensors
@@ -49,81 +49,79 @@ def create_app():
     # Return a tuple with a boolean and an error message
     # This function is used by many routes
     def _isValidColor(color):
-        try:
-            for c in color:
-                if (c < 0) or (c > 255):
-                    return "Invalid color value"
-            return "Valid Color"
-        except TypeError:
-            return "Invalid color type"
+        for c in color:
+            if (c < 0) or (c > 255):
+                return False
+        return True
 
     # ----------------------------------------------------------------------------
     # Route for the messages
     @app.route("/api/v1/messages/", methods=["post"], strict_slashes=False)
     def route_messages():
+        msg = speed = fg = bg = None
         if _isValidJSON(request.data) is False:
             return json.dumps(
                 {"error": "Invalid JSON"}
             ), 400
         else:
             data = request.get_json()
-            if "msg" not in data:
+        if data.get("msg") is None:
+            return json.dumps(
+                {"error": "Missing 'msg' key"}
+            ), 400
+        else:
+            msg = data["msg"]
+        if data.get("speed") is not None:
+            try:
+                speed = float(data["speed"])
+            except ValueError:
                 return json.dumps(
-                    {"error": "Missing 'msg' key"}
+                    {"error": "Invalid speed value"}
                 ), 400
+        if data.get("fg") is not None:
+            try:
+                fg = list(map(int, data["fg"]))
+            except ValueError:
+                return json.dumps(
+                    {"error": "Invalid fg value"}
+                ), 400
+            if len(fg) != 3 or not _isValidColor(fg):
+                return json.dumps(
+                    {"error": "Invalid color for fg"}
+                ), 400
+        if data.get("bg") is not None:
+            try:
+                bg = list(map(int, data["bg"]))
+            except ValueError:
+                return json.dumps(
+                    {"error": "Invalid bg value"}
+                ), 400
+            if len(bg) != 3 or not _isValidColor(bg):
+                return json.dumps(
+                    {"error": "Invalid color for bg"}
+                ), 400
+        # We now have a message to send
+        # 1. 'msg' is the only key
+        if speed is None and len(data) == 1:
+            # Scroll message with default speed
+            leds.post_message(msg)
+        else:
+            # 2. 'msg', 'speed', 'fg', and 'bg' keys
+            if speed is not None and fg is not None and bg is not None:
+                # Scroll message with speed, fg and bg colors
+                leds.post_message(msg, speed, fg, bg)
+            # 3. 'msg' and 'speed' keys
+            elif speed is not None:
+                # Scroll message with speed, white on black colors
+                leds.post_message(msg, speed)
             else:
-                msg = data["msg"]
-                if "speed" in data:
-                    try:
-                        speed = float(data["speed"])
-                    except ValueError:
-                        return json.dumps(
-                            {"error": "Invalid speed value"}
-                        ), 400
-                    if "fg" in data and "bg" in data:
-                        if (not _isValidJSON(data["fg"])) or (
-                            not _isValidJSON(data["bg"])
-                        ):
-                            return (
-                                json.dumps(
-                                    {"error": "Invalid JSON for fg or bg"}),
-                                400,
-                            )
-                        fg = json.loads(data["fg"])
-                        bg = json.loads(data["bg"])
-                        # Test color validity
-                        # Check if fg and bg are lists with 3 elements
-                        if isinstance(fg, list) and len(fg) == 3:
-                            # Check if each element is between 0 and 255
-                            fg_valid = _isValidColor(fg)
-                        else:
-                            fg_valid = "Invalid color type"
-                        if isinstance(bg, list) and len(bg) == 3:
-                            # Check if each element is between 0 and 255
-                            bg_valid = _isValidColor(bg)
-                        else:
-                            bg_valid = "Invalid color type"
-                        if not fg_valid == "Valid Color":
-                            return json.dumps({"error": fg_valid}), 400
-                        if not bg_valid == "Valid Color":
-                            return json.dumps({"error": bg_valid}), 400
-                        # Scroll message with speed and
-                        # foreground + background colors
-                        leds.post_message(msg, speed, fg, bg)
-                    else:
-                        # Scroll message with speed
-                        leds.post_message(msg, speed)
-                else:
-                    if len(data) == 1:
-                        # Scroll message with default speed
-                        # if 'msg' is the only key
-                        leds.post_message(msg)
-                    else:
-                        return json.dumps(
-                            {"error": "Invalid JSON"}
-                        ), 400
+                return json.dumps(
+                    {"error": "Invalid message data"}
+                ), 400
         return json.dumps({"message": "Message processed"})
 
+    # ----------------------------------------------------------------------------
+    # Routes for LEDs
     @app.route("/api/v1/leds", methods=["get"], strict_slashes=False)
     def route_read_leds():
         return leds.read_leds()
@@ -137,15 +135,19 @@ def create_app():
                     ), 400
             else:
                 data = request.get_json()
-                if "color" in data:
-                    rgb = json.loads(data["color"])
-                    rgb_valid = _isValidColor(rgb)
-                    if not rgb_valid == "Valid Color":
-                        return json.dumps(
-                            {"error": rgb_valid}
-                            ), 400
-                    else:
-                        leds.clear_leds(rgb)
+            if data.get("color") is not None:
+                try:
+                    color = list(map(int, data["color"]))
+                except ValueError:
+                    return json.dumps(
+                        {"error": "Invalid color value"}
+                    ), 400
+                if len(color) != 3 or not _isValidColor(color):
+                    return json.dumps(
+                        {"error": "Invalid color"}
+                    ), 400
+                else:
+                    leds.clear_leds(color)
         else:
             leds.clear_leds()
         return json.dumps({"message": "LEDs cleared"})
@@ -153,17 +155,26 @@ def create_app():
     @app.route("/api/v1/leds", methods=["post"], strict_slashes=False)
     def route_set_leds():
         if _isValidJSON(request.data) is False:
-            return json.dumps({"error": "Invalid JSON"}), 400
+            return json.dumps(
+                {"error": "Invalid JSON"}
+                ), 400
         else:
             data = request.get_json()
-            if "leds" not in data:
-                return json.dumps({"error": "Missing 'leds' key"}), 400
+            if data.get("leds") is None:
+                return json.dumps(
+                    {"error": "Missing 'leds' key"}
+                    ), 400
             else:
                 matrix = json.loads(data["leds"])
-                print(matrix)
+                # print(matrix)
+                for color in matrix:
+                    if not _isValidColor(color):
+                        return json.dumps(
+                            {"error": "Invalid color value"}
+                            ), 400
                 if len(matrix) != 64:
                     return json.dumps(
-                        {"error": "Invalid matrix size"}
+                        {"error": "Invalid color matrix size"}
                         ), 400
                 else:
                     leds.set_leds(matrix)
