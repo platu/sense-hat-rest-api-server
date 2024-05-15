@@ -157,11 +157,12 @@ def test_invalid_color_value_for_bg(client):
     )  # nosec B101
 
 
+# 13. Failed POST request with invalid JSON keys
 def test_invalid_JSON_keys(client):
     response = client.post('/api/v1/messages/',
                            json={"msg": "Hello",
                                  "fg": [255, 0, 0], "bg": [0, 255, 0]})
     assert response.status_code == 400  # nosec B101
-    assert "{\"error\": \"Invalid message data\"}" in (
+    assert "{\"error\": \"Invalid message keys\"}" in (
         response.data.decode()
     )  # nosec B101

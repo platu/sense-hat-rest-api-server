@@ -37,7 +37,7 @@ Optional:
   - `{"error": "Invalid 'bg' value"}`
   - `{"error": "Invalid color for 'fg'"}`
   - `{"error": "Invalid color for 'bg'"}`
-  - `{"error": "Invalid message data"}`
+  - `{"error": "Invalid message keys"}`
 
 #### API call examples:
 
@@ -45,6 +45,13 @@ Optional:
 curl -X POST -H "Content-Type: application/json" \
 "http://localhost:8080/api/v1/messages/" \
 -d '{"msg": "Hello, World!"}'
+{"message": "Message processed"}%
+```
+
+```bash
+curl -X POST -H "Content-Type: application/json" \
+"http://localhost:8080/api/v1/messages/" \
+-d '{"msg": "Hello, World!", "speed": 0.02}'
 {"message": "Message processed"}%
 ```
 

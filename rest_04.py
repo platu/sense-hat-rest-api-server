@@ -116,7 +116,7 @@ def create_app():
                 leds.post_message(msg, speed)
             else:
                 return json.dumps(
-                    {"error": "Invalid message data"}
+                    {"error": "Invalid message keys"}
                 ), 400
         return json.dumps({"message": "Message processed"})
 
