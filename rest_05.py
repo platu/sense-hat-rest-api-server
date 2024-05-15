@@ -124,7 +124,8 @@ def create_app():
     # Routes for LEDs
     @app.route("/api/v1/leds", methods=["get"], strict_slashes=False)
     def route_read_leds():
-        return leds.read_leds()
+        data = {"leds": leds.read_leds()}
+        return json.dumps(data)
 
     @app.route("/api/v1/leds", methods=["delete"], strict_slashes=False)
     def route_clear_leds():
@@ -140,11 +141,11 @@ def create_app():
                     color = list(map(int, data["color"]))
                 except ValueError:
                     return json.dumps(
-                        {"error": "Invalid color value"}
+                        {"error": "Invalid color"}
                     ), 400
                 if len(color) != 3 or not _isValidColor(color):
                     return json.dumps(
-                        {"error": "Invalid color"}
+                        {"error": "Invalid color value"}
                     ), 400
                 else:
                     leds.clear_leds(color)
@@ -165,7 +166,7 @@ def create_app():
                     {"error": "Missing 'leds' key"}
                     ), 400
             else:
-                matrix = json.loads(data["leds"])
+                matrix = data["leds"]
                 # print(matrix)
                 for color in matrix:
                     if not _isValidColor(color):
@@ -178,7 +179,7 @@ def create_app():
                         ), 400
                 else:
                     leds.set_leds(matrix)
-            return json.dumps({"message": "LEDs processed"})
+            return json.dumps({"message": "LEDs updated"})
 
     return app
 

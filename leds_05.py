@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import json
-
 
 from multipledispatch import dispatch
 from sense_hat import SenseHat
@@ -51,7 +49,7 @@ def clear_leds(color):  # noqa F811
 
 # Read all leds at once
 def read_leds():
-    return json.dumps(sense.get_pixels(), indent=2)
+    return sense.get_pixels()
 
 
 # Set all leds at once

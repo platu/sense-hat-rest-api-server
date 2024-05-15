@@ -39,5 +39,5 @@ sense.set_pixels(rgb_matrix)
 # Compose JSON data
 # Run the script and redirect the output to a file
 # python3 pixelart.py > yoda.json
-json_data = json.dumps({"leds": "" + str(rgb_matrix) + ""})
+json_data = json.dumps({"leds": rgb_matrix})
 print(json_data)
