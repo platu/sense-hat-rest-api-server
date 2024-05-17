@@ -21,7 +21,7 @@ lint:
     - taplo@0.8.1
     - bandit@1.7.8
     - black@24.4.2
-    - checkov@3.2.90
+    - checkov@3.2.92
     - isort@5.13.2
     - ruff@0.4.4
     - trivy@0.51.1
@@ -29,7 +29,7 @@ lint:
     - git-diff-check
     - markdownlint@0.40.0
     - prettier@3.2.5
-    - trufflehog@3.75.1
+    - trufflehog@3.76.2
 actions:
   disabled:
     - trunk-announce

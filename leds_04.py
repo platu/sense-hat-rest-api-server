@@ -5,7 +5,6 @@
 from multipledispatch import dispatch
 from sense_hat import SenseHat
 
-
 sense = SenseHat()
 
 

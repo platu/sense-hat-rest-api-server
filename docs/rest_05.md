@@ -84,10 +84,10 @@ Required:
 
 - Code: 400
 - Content:
-    - `{"error": "Invalid JSON"}`
-    - `{"error": "Missing 'leds' key"}`
-    - `{"error": "Invalid color value"}`
-    - `{"error": "Invalid color matrix size"}`
+  - `{"error": "Invalid JSON"}`
+  - `{"error": "Missing 'leds' key"}`
+  - `{"error": "Invalid color value"}`
+  - `{"error": "Invalid color matrix size"}`
 
 #### API call example:
 

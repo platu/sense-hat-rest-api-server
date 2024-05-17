@@ -2,11 +2,11 @@
 # -*- coding: utf-8 -*-
 
 import json
+from functools import reduce
+from operator import add
 
 from PIL import Image
 from sense_hat import SenseHat
-from functools import reduce
-from operator import add
 
 sense = SenseHat()
 
